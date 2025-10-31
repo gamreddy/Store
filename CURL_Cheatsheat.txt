@@ -1,9 +1,21 @@
 --retrieve / test
 curl http://localhost:8080/api/test
+curl http://localhost:8080/api/customers/test
 curl http://localhost:8080/api/products/test
 curl http://localhost:8080/api/orders/test
+curl http://localhost:8080/api/customers
 curl http://localhost:8080/api/products
 curl http://localhost:8080/api/orders
+
+--populate customers
+curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/customers -d "{\"name\":\"John\", \"email\":\"John@yahoo.com\", \"address\":\"Houston, TX\"}" 
+curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/customers -d "{\"name\":\"Peter\", \"email\":\"Peter@yahoo.com\", \"address\":\"Austin, TX\"}" 
+curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/customers -d "{\"name\":\"Sam\", \"email\":\"Sam@yahoo.com\", \"address\":\"Dallas, TX\"}" 
+
+--retrieve / test
+curl http://localhost:8080/api/customers
+curl http://localhost:8080/api/customers/1
+curl http://localhost:8080/api/customers?email=John@yahoo.com
 
 --populate products
 curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/products -d "{\"code\":\"CHI-001\", \"name\":\"CHI Silk Infusion\", \"description\":\"CHI Silk Infusion\", \"price\":\"29.99\", \"stock\":100}" 
@@ -20,9 +32,9 @@ curl http://localhost:8080/api/products?code=CHI-001
 curl -X "DELETE" http://localhost:8080/api/products/4
 
 --create order
-curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/orders -d "{\"orderNumber\":\"12345\", \"orderLineItems\":[{\"code\":\"CHI-001\", \"price\": \"29.99\", \"quantity\": 5}]}"
-curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/orders -d "{\"orderNumber\":\"12346\", \"orderLineItems\":[{\"code\":\"CHI-001\", \"price\": \"29.99\", \"quantity\": 90}]}"
-curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/orders -d "{\"orderNumber\":\"12347\", \"orderLineItems\":[{\"code\":\"CHI-001\", \"price\": \"29.99\", \"quantity\": 10}]}"
+curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/orders -d "{\"orderNumber\":\"12345\", \"customerEmail\":\"John@yahoo.com\",\"orderLineItems\":[{\"code\":\"CHI-001\", \"price\": \"29.99\", \"quantity\": 5}]}"
+curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/orders -d "{\"orderNumber\":\"12346\", \"customerEmail\":\"Peter@yahoo.com\", \"orderLineItems\":[{\"code\":\"CHI-001\", \"price\": \"29.99\", \"quantity\": 90}]}"
+curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/orders -d "{\"orderNumber\":\"12347\", \"customerEmail\":\"Sam@yahoo.com\", \"orderLineItems\":[{\"code\":\"CHI-001\", \"price\": \"29.99\", \"quantity\": 10}]}"
 
 --retrieve / test
 curl http://localhost:8080/api/orders

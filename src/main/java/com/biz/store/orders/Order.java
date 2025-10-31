@@ -1,8 +1,10 @@
 package com.biz.store.orders;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,6 +21,9 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id ;
     private String orderNumber ;
+    private String customerEmail;
+    private String status = "PENDING";
+    private BigDecimal total = BigDecimal.ZERO;
     @OneToMany(cascade = CascadeType.ALL)
     private List<OrderLineItem> orderLineItems ;
 	public String getOrderNumber() {
@@ -38,5 +43,23 @@ public class Order {
 	}
 	public void setId(Long id) {
 		this.id = id;
+	}
+	public String getCustomerEmail() {
+		return customerEmail;
+	}
+	public void setCustomerEmail(String customerEmail) {
+		this.customerEmail = customerEmail;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public BigDecimal getTotal() {
+		return total;
+	}
+	public void setTotal(BigDecimal total) {
+		this.total = total;
 	}    
 }

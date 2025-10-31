@@ -1,5 +1,6 @@
 package com.biz.store.orders;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.biz.store.customers.Customer;
+import com.biz.store.customers.CustomerRepository;
 import com.biz.store.products.Product;
 import com.biz.store.products.ProductRepository;
 
@@ -25,6 +28,8 @@ public class OrderController {
 	OrderRepository orderRepository;	
 	@Autowired
 	ProductRepository productRepository;
+	@Autowired
+	CustomerRepository customerRepository;	
 	
     @GetMapping("/test")
     public ResponseEntity<String> test() {
@@ -39,6 +44,16 @@ public class OrderController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Order placeOrder(@RequestBody Order order) {
+    	
+    	//Validate customer
+    	String email = order.getCustomerEmail();
+    	if(email == null || email.isBlank()) {
+    		throw new IllegalArgumentException("Customer not found. Invalid email provided.");
+    	}
+    	List<Customer> customers = this.customerRepository.findByEmail(email)	    	;
+    	if(customers == null || customers.size() == 0) {
+    		throw new IllegalArgumentException("Customer not found. No customer with provided email.");
+    	}
     	
     	List<OrderLineItem> lineItems = order.getOrderLineItems();    	
     	
@@ -63,6 +78,17 @@ public class OrderController {
     		//save product
     		productRepository.save(product);
     	}
+    	
+    	//Calculate subtotal
+    	BigDecimal subtotal = BigDecimal.ZERO;
+    	for(OrderLineItem lineItem : lineItems) {
+    		Product product = this.productRepository.findByCode(lineItem.getCode()).get(0);
+    		subtotal = subtotal.add(product.getPrice().multiply(BigDecimal.valueOf(lineItem.getQuantity())));
+    	}    	
+    	
+    	//Add 10% tax & set total
+    	subtotal = subtotal.add(subtotal.multiply(BigDecimal.valueOf(0.1)));    	
+    	order.setTotal(subtotal);
     	
     	return orderRepository.save(order);
     }
