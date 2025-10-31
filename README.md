@@ -42,8 +42,6 @@ mvn spring-boot:run
 ```
 
 The application will start on `http://localhost:8080`
-Application test url: `http://localhost:8080/api/test`
-For more test urls, please see: CURL_Cheatsheat.txt
 
 ## 🧪 Testing
 
