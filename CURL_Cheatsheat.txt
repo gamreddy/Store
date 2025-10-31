@@ -1,4 +1,7 @@
 --retrieve / test
+curl http://localhost:8080/api/test
+curl http://localhost:8080/api/products/test
+curl http://localhost:8080/api/orders/test
 curl http://localhost:8080/api/products
 curl http://localhost:8080/api/orders
 
