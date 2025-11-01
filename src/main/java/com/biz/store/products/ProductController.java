@@ -46,13 +46,7 @@ public class ProductController {
     public void delete(@PathVariable("id") long productId) {
     	productRepository.deleteById(productId);
     }    
-
-//    @GetMapping(path = "/productByCode")
-//    public List<Product> getProductByCode(@RequestParam("code") String code) {
-//        return productRepository.findByCode(code)
-//                .orElseThrow(() -> new NoSuchElementException("Event with id " + code + " not found"));
-//    }        
-//    
+   
     @PostMapping
     public Product create(@RequestBody Product product) {        
         return productRepository.save(product);
