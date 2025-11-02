@@ -2,8 +2,6 @@ package com.biz.store.products;
 
 import java.util.List;
 import java.util.Optional;
-import com.biz.store.products.Product;
-import com.biz.store.products.ProductDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
