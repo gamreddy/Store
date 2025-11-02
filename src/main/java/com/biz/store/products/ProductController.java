@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/products")
@@ -20,6 +22,8 @@ public class ProductController {
 
 	@Autowired
 	ProductRepository productRepository;
+	@Autowired
+	ProductService productService;	
 	
     @GetMapping("/test")
     public ResponseEntity<String> test() {
@@ -27,19 +31,18 @@ public class ProductController {
     }	
 	
     @GetMapping
-    public List<Product> getProducts(@RequestParam(name = "code", required = false) String code) {
-    	if(code == null || code.isBlank()) {
-    		return productRepository.findAll();
+    public List<ProductDto> getProducts(@RequestParam(name = "code", required = false) String code) {
+    	if(code == null || code.isBlank()) {    		
+    		return productService.fetchAllProducts();
     	}else {
-            return productRepository.findByCode(code);    		
+            return productService.findProductByCode(code);
     	}
     	
     }    
     
     @GetMapping(path = "/{id}")
-    public Product getProductById(@PathVariable("id") long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new NoSuchElementException("Event with id " + productId + " not found"));
+    public ProductDto getProductById(@PathVariable("id") long productId) {
+        return productService.findProductById(productId);
     }    
 
     @DeleteMapping(path = "/{id}")
@@ -48,8 +51,9 @@ public class ProductController {
     }    
    
     @PostMapping
-    public Product create(@RequestBody Product product) {        
-        return productRepository.save(product);
+    @ResponseStatus(HttpStatus.CREATED)
+    public void create(@RequestBody ProductDto productDto) {        
+        productService.createProduct(productDto);
     }    	
 	
 }

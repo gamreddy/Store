@@ -23,12 +23,13 @@ public class ProductRepositoryTests {
 	
     @BeforeEach
     void setUp() {
-    	product = new Product();
-    	product.setName("CHI Silk Infusion");
-    	product.setCode("CHI-001");
-    	product.setDescription("CHI Silk Infusion");
-    	product.setPrice(BigDecimal.valueOf(29.99));
-    	product.setStock(Short.valueOf("100"));    	
+    	product = Product.builder()
+    	.name("CHI Silk Infusion")
+    	.code("CHI-001")
+    	.description("CHI Silk Infusion")
+    	.price(BigDecimal.valueOf(29.99))
+    	.stock(Short.valueOf("100"))
+    	.build();
     	
     	savedProduct = this.productRepository.save(product);
     }
@@ -98,13 +99,14 @@ public class ProductRepositoryTests {
     @Transactional
     @Rollback
     public void testFindAll() {    	
-    	
-    	Product product2 = new Product();
-    	product2.setName("CHI Flat Iron");
-    	product2.setCode("CHI-002");
-    	product2.setDescription("CHI Flat Iron");
-    	product2.setPrice(BigDecimal.valueOf(89.99));
-    	product2.setStock(Short.valueOf("25"));      
+    	    	
+    	Product product2 = Product.builder()
+    	.name("CHI Flat Iron")
+    	.code("CHI-002")
+    	.description("CHI Flat Iron")
+    	.price(BigDecimal.valueOf(89.99))
+    	.stock(Short.valueOf("25"))
+    	.build();    	
     	
     	this.productRepository.save(product2);
     	
