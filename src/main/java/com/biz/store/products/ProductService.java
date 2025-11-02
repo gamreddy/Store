@@ -44,6 +44,10 @@ public class ProductService {
 		return products.stream().map(product -> mapToDto(product)).toList();
 	}
 	
+	public void delete(long id) {
+		productRepository.deleteById(id);
+	}
+	
 	private ProductDto mapToDto(Product product) {
 		return ProductDto.builder()
 		.id(product.getId())

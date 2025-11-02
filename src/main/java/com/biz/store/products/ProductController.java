@@ -21,8 +21,6 @@ import org.springframework.http.HttpStatus;
 public class ProductController {
 
 	@Autowired
-	ProductRepository productRepository;
-	@Autowired
 	ProductService productService;	
 	
     @GetMapping("/test")
@@ -46,8 +44,9 @@ public class ProductController {
     }    
 
     @DeleteMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable("id") long productId) {
-    	productRepository.deleteById(productId);
+    	productService.delete(productId);
     }    
    
     @PostMapping
