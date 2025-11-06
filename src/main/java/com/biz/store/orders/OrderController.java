@@ -30,6 +30,8 @@ public class OrderController {
 	ProductRepository productRepository;
 	@Autowired
 	CustomerRepository customerRepository;	
+	@Autowired
+	OrderService orderService;
 	
     @GetMapping("/test")
     public ResponseEntity<String> test() {
@@ -37,12 +39,11 @@ public class OrderController {
     }		
 
     @GetMapping
-    public List<Order> getOrders() {
-    	return orderRepository.findAll();    	
+    public List<OrderDto> getOrders() {
+    	//return orderRepository.findAll();    	
+		return orderService.fetchAllOrders();
     }        
     
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public Order placeOrder(@RequestBody Order order) {
     	
     	//Validate customer
@@ -92,5 +93,11 @@ public class OrderController {
     	
     	return orderRepository.save(order);
     }
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public void placeOrder2(@RequestBody OrderDto orderDto) {
+		orderService.createOrder(orderDto);
+	}	
     
 }
