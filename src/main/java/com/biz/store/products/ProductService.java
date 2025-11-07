@@ -22,6 +22,15 @@ public class ProductService {
 			.build();
 		productRepository.save(product);		
 	}
+
+	public void updateProducts(List<ProductDto> productDtos){
+		List<Product> products = productRepository.findAllById(productDtos.stream().map(dto -> dto.getId()).toList());
+		for(Product product: products){
+			Optional<ProductDto> productDto = productDtos.stream().filter(dto -> dto.getCode().equals(product.getCode())).findFirst();
+			product.setStock(productDto.get().getStock());
+		}
+		productRepository.saveAll(products);
+	}
 	
 	public List<ProductDto> fetchAllProducts(){
 		List<Product> products = productRepository.findAll();
@@ -35,6 +44,11 @@ public class ProductService {
 		}else {
 			return mapToDto(product.get());
 		}
+	}
+
+	public List<ProductDto> findProductsByCode(List<String> codes) {
+		List<Product> products = productRepository.findAllByCodeIn(codes);
+		return products.stream().map(product -> mapToDto(product)).toList();
 	}
 	
 	public List<ProductDto> findProductByCode(String code) {
@@ -50,6 +64,7 @@ public class ProductService {
 		return ProductDto.builder()
 		.id(product.getId())
 		.name(product.getName())
+		.code(product.getCode())
 		.description(product.getDescription())
 		.price(product.getPrice())
 		.stock(product.getStock())		

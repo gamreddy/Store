@@ -26,7 +26,7 @@ curl -X POST -H "Content-Type:application/json" http://localhost:8080/api/produc
 --retrieve / test
 curl http://localhost:8080/api/products
 curl http://localhost:8080/api/products/1
-curl http://localhost:8080/api/products?code=CHI-001
+curl http://localhost:8080/api/products?codes=CHI-001
 
 --delete product
 curl -X "DELETE" http://localhost:8080/api/products/4

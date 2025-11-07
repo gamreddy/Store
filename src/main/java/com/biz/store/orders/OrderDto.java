@@ -11,7 +11,7 @@ public class OrderDto {
     private Long id ;
     private String orderNumber ;
     private String customerEmail;
-    private String status = "PENDING";
-    private BigDecimal total = BigDecimal.ZERO;
+    private String status;
+    private BigDecimal total;
     private List<OrderLineItemDto> orderLineItems ; 
 }

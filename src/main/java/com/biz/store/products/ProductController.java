@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,11 +29,11 @@ public class ProductController {
     }	
 	
     @GetMapping
-    public List<ProductDto> getProducts(@RequestParam(name = "code", required = false) String code) {
-    	if(code == null || code.isBlank()) {    		
+    public List<ProductDto> getProducts(@RequestParam(name = "codes", required = false) List<String> codes) {
+    	if(codes == null || codes.isEmpty()) {    		
     		return productService.fetchAllProducts();
     	}else {
-            return productService.findProductByCode(code);
+            return productService.findProductsByCode(codes);
     	}
     	
     }    
@@ -52,6 +53,12 @@ public class ProductController {
     @ResponseStatus(HttpStatus.CREATED)
     public void create(@RequestBody ProductDto productDto) {        
         productService.createProduct(productDto);
-    }    	
+    }    
+    
+    @PutMapping
+    @ResponseStatus(HttpStatus.OK)
+    public void udpate(@RequestBody List<ProductDto> productDtos){
+        productService.updateProducts(productDtos);
+    }
 	
 }

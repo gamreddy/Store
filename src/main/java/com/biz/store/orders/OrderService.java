@@ -1,13 +1,16 @@
 package com.biz.store.orders;
 
+import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import com.biz.store.customers.CustomerDto;
+import com.biz.store.products.ProductDto;
 
 @Service
 public class OrderService {
@@ -32,12 +35,49 @@ public class OrderService {
         }
 
         //validate products on orders
+        List<String> codes = dto.getOrderLineItems().stream().map(item->item.getCode()).toList();
+        ProductDto[] products = webClient.get()
+                .uri("api/products",
+                        uriBuilder -> uriBuilder.queryParam("codes", codes).build())
+                .retrieve()
+                .bodyToMono(ProductDto[].class)
+                .block();
 
-        //process each line item
+        if(products == null ||  products.length != codes.size()){
+            throw new IllegalArgumentException("Product not found");
+        }
 
-        //calculate subtotals
+        //Validate each line item
+        BigDecimal subtotal = BigDecimal.ZERO;
+    	for(OrderLineItemDto lineItem : dto.getOrderLineItems()) {
+            
+            Optional<ProductDto> foundProduct = Arrays.asList(products).stream().filter(prod -> prod.getCode().equals(lineItem.getCode())).findFirst();
+    		if(foundProduct.isEmpty()) {
+    			throw new IllegalArgumentException("Product not found");
+    		}
+    		
+    		//check if product is available in stock
+    		if(foundProduct.get().getStock() < lineItem.getQuantity()) {
+    			throw new IllegalStateException("Insufficient stock");
+    		}
 
-        //calculate total
+            //calculate subtotals
+            subtotal = subtotal.add(foundProduct.get().getPrice().multiply(BigDecimal.valueOf(lineItem.getQuantity())));
+
+            //otherwise, update stock on the product
+            foundProduct.get().setStock((short) (foundProduct.get().getStock() - lineItem.getQuantity()));
+    	}
+
+        //Save products
+    	webClient.put()
+                .uri("api/products")
+                .bodyValue(products)
+                .retrieve()
+                .bodyToMono(String.class)                
+                .block();
+                               
+        //Add 10% tax
+        subtotal = subtotal.add(subtotal.multiply(BigDecimal.valueOf(0.1)));    	
 
         List<OrderLineItem> items = dto.getOrderLineItems()
             .stream()
@@ -46,6 +86,7 @@ public class OrderService {
 
         Order order = Order.builder()
             .orderNumber(UUID.randomUUID().toString())
+            .total(subtotal)
             .orderLineItems(items)
             .customerEmail(dto.getCustomerEmail())            
             .build();
@@ -72,6 +113,7 @@ public class OrderService {
             .customerEmail(order.getCustomerEmail())
             .orderNumber(order.getOrderNumber())
             .status(order.getStatus())
+            .total(order.getTotal())
             .orderLineItems(
                 order.getOrderLineItems()
                 .stream()
@@ -82,6 +124,7 @@ public class OrderService {
 
     private OrderLineItemDto mapToOrderLineItemDto(OrderLineItem item){
         return OrderLineItemDto.builder()
+            .id(item.getId())
             .code(item.getCode())
             .price(item.getPrice())
             .quantity(item.getQuantity())

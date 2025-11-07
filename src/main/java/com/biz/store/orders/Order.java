@@ -27,7 +27,9 @@ public class Order {
     private Long id ;
     private String orderNumber ;
     private String customerEmail;
+    @Builder.Default
     private String status = "PENDING";
+    @Builder.Default
     private BigDecimal total = BigDecimal.ZERO;
     @OneToMany(cascade = CascadeType.ALL)
     private List<OrderLineItem> orderLineItems ; 
