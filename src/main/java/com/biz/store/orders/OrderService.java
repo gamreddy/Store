@@ -8,7 +8,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 import com.biz.store.customers.CustomerDto;
 import com.biz.store.products.ProductDto;
 
@@ -18,17 +17,12 @@ public class OrderService {
 	@Autowired
 	private OrderRepository orderRepository;    
     @Autowired
-    private WebClient webClient;
+    private StoreClient storeClient;        
 
     public void createOrder(OrderDto dto){
 
         //validate customer on orders
-        CustomerDto[] customers = webClient.get()
-                .uri("api/customers",
-                        uriBuilder -> uriBuilder.queryParam("email", dto.getCustomerEmail()).build())
-                .retrieve()
-                .bodyToMono(CustomerDto[].class)
-                .block();
+        CustomerDto[] customers = storeClient.getCustomers(dto.getCustomerEmail());
 
         if(customers == null || customers.length != 1){
             throw new IllegalArgumentException("Customer not found. Invalid email provided.");
@@ -36,12 +30,7 @@ public class OrderService {
 
         //validate products on orders
         List<String> codes = dto.getOrderLineItems().stream().map(item->item.getCode()).toList();
-        ProductDto[] products = webClient.get()
-                .uri("api/products",
-                        uriBuilder -> uriBuilder.queryParam("codes", codes).build())
-                .retrieve()
-                .bodyToMono(ProductDto[].class)
-                .block();
+        ProductDto[] products = storeClient.getProducts(codes);
 
         if(products == null ||  products.length != codes.size()){
             throw new IllegalArgumentException("Product not found");
@@ -69,12 +58,7 @@ public class OrderService {
     	}
 
         //Save products
-    	webClient.put()
-                .uri("api/products")
-                .bodyValue(products)
-                .retrieve()
-                .bodyToMono(String.class)                
-                .block();
+        storeClient.updateProducts(products);
                                
         //Add 10% tax
         subtotal = subtotal.add(subtotal.multiply(BigDecimal.valueOf(0.1)));    	
